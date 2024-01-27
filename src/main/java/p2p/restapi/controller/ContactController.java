@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import p2p.restapi.ContactNotFoundException;
@@ -32,22 +35,45 @@ public class ContactController {
             throw new ContactNotFoundException("Contato não encontrado com o ID: " + id);
         }
     }
+
     @PostMapping
-    public Contact save(@RequestBody Contact contact){
-      return  repository.save(contact);
+    public ResponseEntity<Contact> save(@RequestBody Contact contact) {
+        try {
+            Contact savedContact = repository.save(contact);
+            return new ResponseEntity<>(savedContact, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
 
     @PutMapping
-    public Contact update(@RequestBody Contact contact){
-        if(contact.getId()> 0){
-         return repository.save(contact);
-        } return null;
+    public ResponseEntity<Contact> update(@RequestBody Contact contact) {
+        if (contact.getId() == null || contact.getId() <= 0) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return repository.existsById(contact.getId()) ?
+                new ResponseEntity<>(repository.save(contact), HttpStatus.OK) :
+                new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @DeleteMapping
-    public void delete(@RequestBody Contact contact){
-     if(contact.getId()> 0) {
-        repository.delete(contact);
-     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> delete(@PathVariable Long id) {
+        try {
+            repository.deleteById(id);
+            return new ResponseEntity<>("Contato excluído com sucesso", HttpStatus.OK);
+        } catch (EmptyResultDataAccessException e) {
+            return new ResponseEntity<>("Contato não encontrado com o ID: " + id, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Erro ao excluir o contato", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
+
+
+
+
+
 }

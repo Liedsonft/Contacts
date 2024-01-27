@@ -10,7 +10,7 @@ import jakarta.persistence.Id;
 public class Contact {
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false)
     private String name;
@@ -32,7 +32,7 @@ public class Contact {
     public void setPicture(String picture) {
         this.picture = picture;
     }
-    public long getId() {
+    public Long getId() {
         return id;
     }
     public void setId(long id) {
