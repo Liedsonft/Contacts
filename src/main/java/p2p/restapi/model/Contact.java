@@ -5,24 +5,27 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Email;
 
 @Entity
 public class Contact {
-    @Id 
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @NotBlank(message = "O nome não pode estar em branco")
     private String name;
 
-    @Column(nullable = false)
+    @NotBlank(message = "O telefone não pode estar em branco")
+    @Pattern(regexp = "\\d{10,14}", message = "O telefone deve ter entre 10 e 14 dígitos")
     private String phone;
 
+    @Email(message = "Deve ser um endereço de e-mail válido")
     private String email;
 
-    
     private String picture;
-
 
 
 
